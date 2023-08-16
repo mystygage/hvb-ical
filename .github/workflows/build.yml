@@ -1,0 +1,43 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Set timezone
+      uses: szenius/set-timezone@v1.2
+      with:
+        timezoneLinux: "Europe/Berlin"
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Build File
+      run: npm run start
+
+    - name: Deploy to GitHub Pages
+      run: |
+        mkdir public
+        cp calendar.ics public/
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
